@@ -1,0 +1,245 @@
+@model PlacementManagementSystem.ViewModels.AdminDashboardViewModel
+@{
+    ViewData["Title"] = "Admin Dashboard";
+}
+
+<div class="container py-4">
+    <!-- HEADER -->
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center pb-3 mb-4 border-bottom">
+        <div>
+            <span class="badge bg-danger bg-opacity-10 text-danger fw-bold px-3 py-1 rounded-pill mb-1">
+                <i class="bi bi-shield-lock-fill me-1"></i> Placement Officer Portal
+            </span>
+            <h1 class="h2 fw-bold text-dark mb-0">Placement Cell Dashboard</h1>
+            <p class="text-muted small mb-0 mt-1">Overview of students, recruitment drives, company partnerships, and placement outcomes</p>
+        </div>
+        <div class="mt-3 mt-md-0 d-flex flex-wrap gap-2">
+            <a asp-controller="PlacementDrive" asp-action="Create" class="btn btn-primary-custom btn-sm">
+                <i class="bi bi-plus-circle me-1"></i> New Placement Drive
+            </a>
+            <a asp-controller="Company" asp-action="Create" class="btn btn-outline-custom btn-sm">
+                <i class="bi bi-building-add me-1"></i> Add Company
+            </a>
+            <a asp-controller="Placement" asp-action="Create" class="btn btn-success btn-sm">
+                <i class="bi bi-award me-1"></i> Add Placement Record
+            </a>
+        </div>
+    </div>
+
+    <!-- STATS CARDS -->
+    <div class="row g-4 mb-5">
+        <div class="col-lg-3 col-sm-6">
+            <div class="stat-card">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <div class="stat-label">Total Students</div>
+                        <div class="stat-number">@Model.TotalStudents</div>
+                        <small class="text-muted"><a asp-action="Index" class="text-primary text-decoration-none">Manage Directory &rarr;</a></small>
+                    </div>
+                    <div class="stat-icon bg-primary bg-opacity-10 text-primary">
+                        <i class="bi bi-people-fill"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-sm-6">
+            <div class="stat-card">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <div class="stat-label">Partner Companies</div>
+                        <div class="stat-number">@Model.TotalCompanies</div>
+                        <small class="text-muted"><a asp-controller="Company" asp-action="Index" class="text-success text-decoration-none">View Companies &rarr;</a></small>
+                    </div>
+                    <div class="stat-icon bg-success bg-opacity-10 text-success">
+                        <i class="bi bi-building"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-sm-6">
+            <div class="stat-card">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <div class="stat-label">Active Drives</div>
+                        <div class="stat-number text-info">@Model.ActivePlacementDrives</div>
+                        <small class="text-muted"><a asp-controller="PlacementDrive" asp-action="Index" class="text-info text-decoration-none">Manage Drives &rarr;</a></small>
+                    </div>
+                    <div class="stat-icon bg-info bg-opacity-10 text-info">
+                        <i class="bi bi-briefcase-fill"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-sm-6">
+            <div class="stat-card">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <div class="stat-label">Students Placed</div>
+                        <div class="stat-number text-success">@Model.TotalPlacedStudents</div>
+                        <small class="text-muted"><a asp-controller="Placement" asp-action="Index" class="text-success text-decoration-none">Placement Records &rarr;</a></small>
+                    </div>
+                    <div class="stat-icon bg-warning bg-opacity-10 text-warning">
+                        <i class="bi bi-trophy-fill"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SALARY & APPLICATIONS HIGHLIGHTS -->
+    <div class="row g-4 mb-5">
+        <div class="col-md-4">
+            <div class="card card-custom p-4 bg-light border-0 h-100">
+                <h6 class="text-uppercase text-muted fw-bold small mb-2">Total Applications</h6>
+                <div class="display-6 fw-bold text-dark mb-1">@Model.TotalApplications</div>
+                <div class="small text-muted mb-3">Submitted by students across all drives</div>
+                <div class="d-flex justify-content-between align-items-center pt-2 border-top">
+                    <span class="small text-success fw-bold">@Model.TotalSelectedApplications Selected</span>
+                    <a asp-controller="Application" asp-action="Index" class="btn btn-sm btn-outline-primary">Review Applications</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card card-custom p-4 bg-light border-0 h-100">
+                <h6 class="text-uppercase text-muted fw-bold small mb-2">Average Salary Package</h6>
+                <div class="display-6 fw-bold text-primary mb-1">₹ @Model.AveragePackage.ToString("F2") <span class="fs-5 text-muted">LPA</span></div>
+                <div class="small text-muted mb-3">Mean compensation offered to graduates</div>
+                <div class="pt-2 border-top text-muted small">
+                    Calculated from verified placement records
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card card-custom p-4 bg-light border-0 h-100">
+                <h6 class="text-uppercase text-muted fw-bold small mb-2">Highest Salary Package</h6>
+                <div class="display-6 fw-bold text-warning mb-1">₹ @Model.HighestPackage.ToString("F2") <span class="fs-5 text-muted">LPA</span></div>
+                <div class="small text-muted mb-3">Top campus recruitment offer of the season</div>
+                <div class="pt-2 border-top text-muted small">
+                    Offered by premier tier-1 technology partners
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- RECENT DATA SECTIONS -->
+    <div class="row g-4">
+        <!-- RECENT APPLICATIONS -->
+        <div class="col-lg-6">
+            <div class="card card-custom h-100 p-4">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="fw-bold text-dark mb-0">
+                        <i class="bi bi-file-earmark-person me-2 text-primary"></i>Recent Applications
+                    </h5>
+                    <a asp-controller="Application" asp-action="Index" class="btn btn-outline-custom btn-sm">View All</a>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light small">
+                            <tr>
+                                <th>Student</th>
+                                <th>Drive</th>
+                                <th>Status</th>
+                                <th class="text-end">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody class="small">
+                            @if (Model.RecentApplications.Any())
+                            {
+                                @foreach (var app in Model.RecentApplications)
+                                {
+                                    <tr>
+                                        <td>
+                                            <strong class="d-block text-dark">@app.Student?.FullName</strong>
+                                            <span class="text-muted" style="font-size: 0.75rem;">@app.Student?.EnrollmentNo</span>
+                                        </td>
+                                        <td>
+                                            <span class="d-block text-dark">@app.PlacementDrive?.JobTitle</span>
+                                            <span class="text-muted" style="font-size: 0.75rem;">@app.PlacementDrive?.Company?.CompanyName</span>
+                                        </td>
+                                        <td>
+                                            @{
+                                                var badgeClass = app.Status switch
+                                                {
+                                                    "Selected" => "status-badge-selected",
+                                                    "Interview" => "status-badge-interview",
+                                                    "Shortlisted" => "status-badge-shortlisted",
+                                                    "Rejected" => "status-badge-rejected",
+                                                    _ => "status-badge-applied"
+                                                };
+                                            }
+                                            <span class="status-badge @badgeClass py-0 px-2" style="font-size: 0.75rem;">
+                                                @app.Status
+                                            </span>
+                                        </td>
+                                        <td class="text-end">
+                                            <a asp-controller="Application" asp-action="Details" asp-route-id="@app.Id" class="btn btn-sm btn-light border py-0 px-2">
+                                                Review
+                                            </a>
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                            else
+                            {
+                                <tr>
+                                    <td colspan="4" class="text-center py-3 text-muted">No applications recorded yet.</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- UPCOMING PLACEMENT DRIVES -->
+        <div class="col-lg-6">
+            <div class="card card-custom h-100 p-4">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="fw-bold text-dark mb-0">
+                        <i class="bi bi-calendar-event me-2 text-info"></i>Upcoming Placement Drives
+                    </h5>
+                    <a asp-controller="PlacementDrive" asp-action="Index" class="btn btn-outline-custom btn-sm">View All</a>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light small">
+                            <tr>
+                                <th>Role & Company</th>
+                                <th>Drive Date</th>
+                                <th>Package</th>
+                                <th class="text-end">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody class="small">
+                            @if (Model.UpcomingPlacementDrives.Any())
+                            {
+                                @foreach (var drive in Model.UpcomingPlacementDrives)
+                                {
+                                    <tr>
+                                        <td>
+                                            <strong class="d-block text-dark">@drive.JobTitle</strong>
+                                            <span class="text-muted" style="font-size: 0.75rem;">@drive.Company?.CompanyName</span>
+                                        </td>
+                                        <td>@drive.DriveDate.ToString("dd MMM yyyy")</td>
+                                        <td><span class="text-success fw-bold">₹ @drive.SalaryPackage.ToString("F2") LPA</span></td>
+                                        <td class="text-end">
+                                            <a asp-controller="PlacementDrive" asp-action="Details" asp-route-id="@drive.Id" class="btn btn-sm btn-light border py-0 px-2">
+                                                Details
+                                            </a>
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                            else
+                            {
+                                <tr>
+                                    <td colspan="4" class="text-center py-3 text-muted">No upcoming drives scheduled.</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

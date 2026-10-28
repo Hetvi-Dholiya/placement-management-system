@@ -1,0 +1,192 @@
+@model IEnumerable<PlacementManagementSystem.Models.Placement>
+@using Microsoft.AspNetCore.Http
+@inject IHttpContextAccessor HttpContextAccessor
+@{
+    ViewData["Title"] = "Placement Records";
+    var session = HttpContextAccessor.HttpContext?.Session;
+    var isAdmin = session?.IsAdmin() ?? false;
+    var isStudent = session?.IsStudent() ?? false;
+
+    var companies = ViewBag.Companies as SelectList;
+    var departments = ViewBag.Departments as List<string> ?? new List<string>();
+    var searchString = ViewBag.SearchString as string;
+    var selectedCompanyId = ViewBag.SelectedCompanyId as int?;
+    var selectedDept = ViewBag.SelectedDepartment as string;
+}
+
+<div class="container py-4">
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center pb-3 mb-4 border-bottom">
+        <div>
+            <span class="badge bg-success bg-opacity-10 text-success fw-bold px-3 py-1 rounded-pill mb-1">
+                Recruitment Records
+            </span>
+            <h1 class="h2 fw-bold text-dark mb-0">Official Placement Records</h1>
+            <p class="text-muted small mb-0 mt-1">Official verified campus placement selections, package compensations, and corporate hiring records</p>
+        </div>
+        @if (isAdmin)
+        {
+            <div class="mt-3 mt-md-0">
+                <a asp-action="Create" class="btn btn-success btn-sm fw-bold">
+                    <i class="bi bi-award-fill me-1"></i> Add Placement Record
+                </a>
+            </div>
+        }
+    </div>
+
+    <!-- STATS SUMMARY CARDS -->
+    <div class="row g-4 mb-4">
+        <div class="col-md-4">
+            <div class="stat-card">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <div class="stat-label">Students Placed</div>
+                        <div class="stat-number text-success">@ViewBag.TotalPlaced</div>
+                    </div>
+                    <div class="stat-icon bg-success bg-opacity-10 text-success">
+                        <i class="bi bi-person-check-fill"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="stat-card">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <div class="stat-label">Average CTC Package</div>
+                        <div class="stat-number text-primary">₹ @ViewBag.AvgPackage <span class="fs-6 text-muted">LPA</span></div>
+                    </div>
+                    <div class="stat-icon bg-primary bg-opacity-10 text-primary">
+                        <i class="bi bi-graph-up"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="stat-card">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <div class="stat-label">Highest Package</div>
+                        <div class="stat-number text-warning">₹ @ViewBag.MaxPackage <span class="fs-6 text-muted">LPA</span></div>
+                    </div>
+                    <div class="stat-icon bg-warning bg-opacity-10 text-warning">
+                        <i class="bi bi-trophy-fill"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SEARCH & FILTERS -->
+    <div class="filter-card">
+        <form method="get" asp-action="Index">
+            <div class="row g-3 align-items-end">
+                <div class="col-md-4">
+                    <label class="form-label small">Search Student / Company / Role</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-white border-end-0"><i class="bi bi-search text-muted"></i></span>
+                        <input type="text" name="searchString" value="@searchString" class="form-control border-start-0" placeholder="Student, company, or job role..." />
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label small">Company</label>
+                    <select name="companyId" class="form-select" asp-items="companies">
+                        <option value="">All Companies</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label small">Department</label>
+                    <select name="department" class="form-select">
+                        <option value="All">All Departments</option>
+                        @foreach (var dept in departments)
+                        {
+                            <option value="@dept" selected="@(selectedDept == dept)">@dept</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-md-2 d-flex gap-2">
+                    <button type="submit" class="btn btn-primary-custom flex-grow-1">
+                        <i class="bi bi-funnel me-1"></i> Filter
+                    </button>
+                    <a asp-action="Index" class="btn btn-outline-custom">
+                        Reset
+                    </a>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- PLACEMENTS TABLE -->
+    <div class="table-custom shadow-sm">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead>
+                    <tr>
+                        <th>Student Name</th>
+                        <th>Enrollment</th>
+                        <th>Department</th>
+                        <th>Company</th>
+                        <th>Job Role</th>
+                        <th>Package (CTC)</th>
+                        <th>Placement Date</th>
+                        <th>Status</th>
+                        @if (isAdmin)
+                        {
+                            <th class="text-end">Actions</th>
+                        }
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model != null && Model.Any())
+                    {
+                        @foreach (var p in Model)
+                        {
+                            <tr>
+                                <td><strong class="text-dark">@p.Student?.FullName</strong></td>
+                                <td><span class="badge bg-light text-dark border">@p.Student?.EnrollmentNo</span></td>
+                                <td><span class="small">@p.Student?.Department</span></td>
+                                <td>
+                                    <div class="fw-bold text-primary">@p.Company?.CompanyName</div>
+                                </td>
+                                <td>@p.JobRole</td>
+                                <td>
+                                    <span class="text-success fw-bold fs-6">₹ @p.Package.ToString("F2") LPA</span>
+                                </td>
+                                <td>@p.PlacementDate.ToString("dd MMM yyyy")</td>
+                                <td>
+                                    <span class="status-badge status-badge-placed py-0 px-2" style="font-size: 0.75rem;">
+                                        @p.Status
+                                    </span>
+                                </td>
+                                @if (isAdmin)
+                                {
+                                    <td class="text-end">
+                                        <div class="btn-group btn-group-sm">
+                                            <a asp-action="Details" asp-route-id="@p.Id" class="btn btn-outline-secondary" title="Details">
+                                                <i class="bi bi-eye"></i>
+                                            </a>
+                                            <a asp-action="Edit" asp-route-id="@p.Id" class="btn btn-outline-primary" title="Edit">
+                                                <i class="bi bi-pencil"></i>
+                                            </a>
+                                            <a asp-action="Delete" asp-route-id="@p.Id" class="btn btn-outline-danger" title="Delete">
+                                                <i class="bi bi-trash"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                }
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="@(isAdmin ? 9 : 8)" class="text-center py-5 text-muted">
+                                <i class="bi bi-trophy fs-2"></i>
+                                <p class="mt-2 mb-0">No placement records found matching the specified filters.</p>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

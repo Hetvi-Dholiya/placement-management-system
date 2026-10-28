@@ -1,0 +1,222 @@
+@model PlacementManagementSystem.ViewModels.StudentProfileViewModel
+@{
+    ViewData["Title"] = "Student Profile";
+    var applications = ViewBag.Applications as List<PlacementManagementSystem.Models.Application> ?? new List<PlacementManagementSystem.Models.Application>();
+    var placements = ViewBag.Placements as List<PlacementManagementSystem.Models.Placement> ?? new List<PlacementManagementSystem.Models.Placement>();
+}
+
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold text-dark mb-0"><i class="bi bi-person-circle me-2 text-primary"></i>My Student Profile</h2>
+            <p class="text-muted small mb-0">View and update your academic details, technical skills, and resume</p>
+        </div>
+        <a asp-action="Dashboard" class="btn btn-outline-custom btn-sm">
+            <i class="bi bi-arrow-left me-1"></i> Back to Dashboard
+        </a>
+    </div>
+
+    <div class="row g-4">
+        <!-- PROFILE SUMMARY CARD -->
+        <div class="col-lg-4">
+            <div class="card card-custom p-4 text-center mb-4">
+                @if (!string.IsNullOrEmpty(Model.ExistingProfilePicture))
+                {
+                    <img src="~/uploads/profiles/@Model.ExistingProfilePicture" alt="@Model.FullName" class="rounded-circle shadow-sm mx-auto mb-3 border border-3 border-primary-subtle" style="width: 96px; height: 96px; object-fit: cover;" />
+                }
+                else
+                {
+                    <div class="stat-icon bg-primary bg-opacity-10 text-primary mx-auto mb-3" style="width: 80px; height: 80px;">
+                        <i class="bi bi-person-fill fs-1"></i>
+                    </div>
+                }
+                <h4 class="fw-bold mb-1 text-dark">@Model.FullName</h4>
+                <div class="badge bg-secondary mb-2">@Model.EnrollmentNo</div>
+                <p class="text-muted small mb-3">@Model.Department</p>
+
+                <div class="bg-light p-3 rounded-3 text-start mb-3">
+                    <div class="d-flex justify-content-between mb-2 small">
+                        <span class="text-muted">Current CGPA:</span>
+                        <strong class="text-success fs-6">@Model.CGPA.ToString("F2") / 10</strong>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2 small">
+                        <span class="text-muted">Semester:</span>
+                        <strong>Semester @Model.Semester</strong>
+                    </div>
+                    <div class="d-flex justify-content-between small">
+                        <span class="text-muted">Gender:</span>
+                        <strong>@Model.Gender</strong>
+                    </div>
+                </div>
+
+                @if (!string.IsNullOrEmpty(Model.ExistingResumeFileName))
+                {
+                    <div class="alert alert-success py-2 small mb-0 d-flex align-items-center justify-content-between">
+                        <div>
+                            <i class="bi bi-file-earmark-pdf-fill me-1 text-danger"></i> Resume Uploaded
+                        </div>
+                        <a href="~/uploads/resumes/@Model.ExistingResumeFileName" target="_blank" class="btn btn-sm btn-outline-success py-0 px-2">
+                            View
+                        </a>
+                    </div>
+                }
+                else
+                {
+                    <div class="alert alert-warning py-2 small mb-0">
+                        <i class="bi bi-exclamation-circle me-1"></i> No resume uploaded yet
+                    </div>
+                }
+            </div>
+
+            <!-- PLACEMENT STATUS SUMMARY -->
+            @if (placements.Any(p => p.Status == "Placed"))
+            {
+                var p = placements.First(x => x.Status == "Placed");
+                <div class="card card-custom p-4 bg-success bg-opacity-10 border-success">
+                    <div class="d-flex align-items-center gap-2 mb-2 text-success">
+                        <i class="bi bi-patch-check-fill fs-4"></i>
+                        <h6 class="fw-bold mb-0">Placed Candidate</h6>
+                    </div>
+                    <p class="small text-muted mb-2">
+                        Company: <strong>@p.Company?.CompanyName</strong><br />
+                        Role: <strong>@p.JobRole</strong><br />
+                        Salary Package: <strong class="text-success">₹ @p.Package.ToString("F2") LPA</strong>
+                    </p>
+                </div>
+            }
+        </div>
+
+        <!-- PROFILE EDIT FORM -->
+        <div class="col-lg-8">
+            <div class="card form-card shadow-sm">
+                <h5 class="fw-bold text-dark mb-3 pb-2 border-bottom">
+                    <i class="bi bi-pencil-square me-2 text-primary"></i>Edit Profile Information
+                </h5>
+
+                <form asp-action="Profile" method="post" enctype="multipart/form-data">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" asp-for="Id" />
+                    <input type="hidden" asp-for="EnrollmentNo" />
+                    <input type="hidden" asp-for="ExistingProfilePicture" />
+                    <input type="hidden" asp-for="ExistingResumeFileName" />
+
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger py-2 small" role="alert"></div>
+
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Enrollment Number</label>
+                            <input class="form-control bg-light" value="@Model.EnrollmentNo" readonly />
+                            <small class="text-muted">Enrollment number is academic ID and cannot be modified.</small>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label asp-for="FullName" class="form-label"></label>
+                            <input asp-for="FullName" class="form-control" />
+                            <span asp-validation-for="FullName" class="text-danger small"></span>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label asp-for="Email" class="form-label"></label>
+                            <input asp-for="Email" class="form-control" />
+                            <span asp-validation-for="Email" class="text-danger small"></span>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label asp-for="Phone" class="form-label"></label>
+                            <input asp-for="Phone" class="form-control" />
+                            <span asp-validation-for="Phone" class="text-danger small"></span>
+                        </div>
+
+                        <div class="col-md-4">
+                            <label asp-for="DateOfBirth" class="form-label"></label>
+                            <input asp-for="DateOfBirth" class="form-control" type="date" />
+                            <span asp-validation-for="DateOfBirth" class="text-danger small"></span>
+                        </div>
+
+                        <div class="col-md-4">
+                            <label asp-for="Gender" class="form-label"></label>
+                            <select asp-for="Gender" class="form-select">
+                                <option value="Male">Male</option>
+                                <option value="Female">Female</option>
+                                <option value="Other">Other</option>
+                            </select>
+                            <span asp-validation-for="Gender" class="text-danger small"></span>
+                        </div>
+
+                        <div class="col-md-4">
+                            <label asp-for="Semester" class="form-label"></label>
+                            <select asp-for="Semester" class="form-select">
+                                @for (int i = 1; i <= 8; i++)
+                                {
+                                    <option value="@i">Semester @i</option>
+                                }
+                            </select>
+                            <span asp-validation-for="Semester" class="text-danger small"></span>
+                        </div>
+
+                        <div class="col-md-8">
+                            <label asp-for="Department" class="form-label"></label>
+                            <select asp-for="Department" class="form-select">
+                                <option value="Computer Science and Engineering">Computer Science and Engineering</option>
+                                <option value="Information Technology">Information Technology</option>
+                                <option value="Electronics and Communication">Electronics and Communication</option>
+                                <option value="Mechanical Engineering">Mechanical Engineering</option>
+                                <option value="Civil Engineering">Civil Engineering</option>
+                            </select>
+                            <span asp-validation-for="Department" class="text-danger small"></span>
+                        </div>
+
+                        <div class="col-md-4">
+                            <label asp-for="CGPA" class="form-label"></label>
+                            <input asp-for="CGPA" class="form-control" type="number" step="0.01" min="0" max="10" />
+                            <span asp-validation-for="CGPA" class="text-danger small"></span>
+                        </div>
+
+                        <div class="col-12">
+                            <label asp-for="Skills" class="form-label"></label>
+                            <input asp-for="Skills" class="form-control" placeholder="e.g. C#, ASP.NET Core MVC, React, Python, MySQL" />
+                            <span asp-validation-for="Skills" class="text-danger small"></span>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label asp-for="ProfilePictureFile" class="form-label">
+                                <i class="bi bi-camera me-1 text-primary"></i> Upload Profile Picture
+                            </label>
+                            <input asp-for="ProfilePictureFile" class="form-control" type="file" accept=".jpg,.jpeg,.png,.webp,.gif" />
+                            <span asp-validation-for="ProfilePictureFile" class="text-danger small"></span>
+                            <small class="text-muted">Accepted formats: .jpg, .jpeg, .png, .webp (max 5MB)</small>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label asp-for="ResumeFile" class="form-label">
+                                <i class="bi bi-file-earmark-pdf me-1 text-danger"></i> Upload Resume Document
+                            </label>
+                            <input asp-for="ResumeFile" class="form-control" type="file" accept=".pdf,.doc,.docx" />
+                            <span asp-validation-for="ResumeFile" class="text-danger small"></span>
+                            <small class="text-muted">Accepted formats: .pdf, .docx, .doc</small>
+                        </div>
+
+                        <div class="col-12">
+                            <label asp-for="NewPassword" class="form-label">
+                                <i class="bi bi-key me-1 text-primary"></i> Change Password
+                            </label>
+                            <input asp-for="NewPassword" class="form-control" placeholder="Leave empty to keep current password unchanged" />
+                            <span asp-validation-for="NewPassword" class="text-danger small"></span>
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-end gap-2 mt-4 pt-3 border-top">
+                        <a asp-action="Dashboard" class="btn btn-outline-custom">Cancel</a>
+                        <button type="submit" class="btn btn-primary-custom px-4 fw-bold">
+                            <i class="bi bi-save me-1"></i> Save Changes
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

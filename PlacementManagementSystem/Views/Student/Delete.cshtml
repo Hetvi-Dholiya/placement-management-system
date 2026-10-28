@@ -1,0 +1,52 @@
+@model PlacementManagementSystem.Models.Student
+@{
+    ViewData["Title"] = $"Delete Student - {Model.FullName}";
+}
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-7 col-lg-6">
+            <div class="card card-custom p-4 shadow-sm border-danger">
+                <div class="text-center mb-3 text-danger">
+                    <i class="bi bi-exclamation-triangle-fill display-4"></i>
+                    <h3 class="fw-bold mt-2 text-dark">Confirm Student Deletion</h3>
+                    <p class="text-muted small">Are you sure you want to permanently delete this student record? This action cannot be undone.</p>
+                </div>
+
+                <div class="bg-light p-3 rounded-3 mb-4 small">
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="text-muted">Enrollment No:</span>
+                        <strong class="text-dark">@Model.EnrollmentNo</strong>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="text-muted">Full Name:</span>
+                        <strong class="text-dark">@Model.FullName</strong>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="text-muted">Department:</span>
+                        <strong class="text-dark">@Model.Department</strong>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="text-muted">CGPA:</span>
+                        <strong>@Model.CGPA.ToString("F2")</strong>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <span class="text-muted">Submitted Applications:</span>
+                        <span class="badge bg-secondary">@Model.Applications.Count</span>
+                    </div>
+                </div>
+
+                <form asp-action="Delete" method="post">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" asp-for="Id" />
+                    <div class="d-flex justify-content-end gap-2">
+                        <a asp-action="Index" class="btn btn-outline-custom">Cancel</a>
+                        <button type="submit" class="btn btn-danger px-4 fw-bold">
+                            <i class="bi bi-trash-fill me-1"></i> Yes, Delete Record
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

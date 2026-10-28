@@ -1,0 +1,56 @@
+@model PlacementManagementSystem.ViewModels.LoginViewModel
+@{
+    ViewData["Title"] = "Portal Login";
+}
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6 col-lg-5">
+            <div class="card form-card shadow-lg border-0">
+                <div class="text-center mb-4">
+                    <span class="navbar-brand-badge py-2 px-3 fs-5 d-inline-block mb-2">CPMS</span>
+                    <h3 class="fw-bold text-dark">Portal Login</h3>
+                    <p class="text-muted small">Sign in to your Student or Placement Officer account</p>
+                </div>
+
+                <form asp-action="Login" method="post">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="ReturnUrl" value="@ViewData["ReturnUrl"]" />
+
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger py-2 small" role="alert"></div>
+
+                    <div class="mb-3">
+                        <label asp-for="Username" class="form-label">
+                            <i class="bi bi-person me-1 text-primary"></i> Email or Enrollment Number
+                        </label>
+                        <input asp-for="Username" class="form-control" placeholder="e.g. 21BCSE001 or admin@college.com" autofocus />
+                        <span asp-validation-for="Username" class="text-danger small"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Password" class="form-label">
+                            <i class="bi bi-key me-1 text-primary"></i> Password
+                        </label>
+                        <input asp-for="Password" class="form-control" placeholder="Enter your account password" />
+                        <span asp-validation-for="Password" class="text-danger small"></span>
+                    </div>
+
+                    <div class="d-grid gap-2 mb-3 mt-4">
+                        <button type="submit" class="btn btn-primary-custom py-2 fw-bold">
+                            <i class="bi bi-box-arrow-in-right me-1"></i> Sign In
+                        </button>
+                    </div>
+
+                    <div class="text-center small text-muted mb-3">
+                        Don't have a student account? 
+                        <a asp-action="Register" class="text-primary fw-bold text-decoration-none">Register as Student</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

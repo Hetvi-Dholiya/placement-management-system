@@ -1,0 +1,146 @@
+@model IEnumerable<PlacementManagementSystem.Models.Company>
+@using Microsoft.AspNetCore.Http
+@inject IHttpContextAccessor HttpContextAccessor
+@{
+    ViewData["Title"] = "Partner Companies";
+    var isAdmin = HttpContextAccessor.HttpContext?.Session.IsAdmin() ?? false;
+    var industries = ViewBag.Industries as List<string> ?? new List<string>();
+    var selectedIndustry = ViewBag.SelectedIndustry as string;
+    var searchString = ViewBag.SearchString as string;
+}
+
+<div class="container py-4">
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center pb-3 mb-4 border-bottom">
+        <div>
+            <span class="badge bg-primary bg-opacity-10 text-primary fw-bold px-3 py-1 rounded-pill mb-1">
+                Recruitment Partners
+            </span>
+            <h1 class="h2 fw-bold text-dark mb-0">Partner Companies</h1>
+            <p class="text-muted small mb-0 mt-1">Leading industry recruiters collaborating with the college for campus placements</p>
+        </div>
+        @if (isAdmin)
+        {
+            <div class="mt-3 mt-md-0">
+                <a asp-action="Create" class="btn btn-primary-custom btn-sm">
+                    <i class="bi bi-building-add me-1"></i> Register New Company
+                </a>
+            </div>
+        }
+    </div>
+
+    <!-- SEARCH & FILTER BAR -->
+    <div class="filter-card">
+        <form method="get" asp-action="Index">
+            <div class="row g-3 align-items-end">
+                <div class="col-md-6">
+                    <label class="form-label small">Search Companies</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-white border-end-0"><i class="bi bi-search text-muted"></i></span>
+                        <input type="text" name="searchString" value="@searchString" class="form-control border-start-0" placeholder="Search by company name, location, or HR..." />
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label small">Filter by Industry</label>
+                    <select name="industry" class="form-select">
+                        <option value="All">All Industries</option>
+                        @foreach (var ind in industries)
+                        {
+                            <option value="@ind" selected="@(selectedIndustry == ind)">@ind</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-md-3 d-flex gap-2">
+                    <button type="submit" class="btn btn-primary-custom flex-grow-1">
+                        <i class="bi bi-funnel me-1"></i> Filter
+                    </button>
+                    <a asp-action="Index" class="btn btn-outline-custom">
+                        Reset
+                    </a>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- COMPANIES TABLE -->
+    <div class="table-custom shadow-sm">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead>
+                    <tr>
+                        <th>Company Name</th>
+                        <th>Industry</th>
+                        <th>Location</th>
+                        <th>HR Contact</th>
+                        <th>Drives</th>
+                        <th>Placements</th>
+                        <th class="text-end">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model != null && Model.Any())
+                    {
+                        @foreach (var company in Model)
+                        {
+                            <tr>
+                                <td>
+                                    <div class="fw-bold text-dark fs-6">@company.CompanyName</div>
+                                    @if (!string.IsNullOrEmpty(company.Website))
+                                    {
+                                        <a href="@company.Website" target="_blank" class="small text-primary text-decoration-none">
+                                            <i class="bi bi-box-arrow-up-right me-1"></i> @company.Website
+                                        </a>
+                                    }
+                                </td>
+                                <td>
+                                    <span class="badge bg-light text-dark border">@company.Industry</span>
+                                </td>
+                                <td>
+                                    <span class="small"><i class="bi bi-geo-alt me-1 text-muted"></i>@company.Location</span>
+                                </td>
+                                <td>
+                                    <div class="small fw-semibold text-dark">@company.HRName</div>
+                                    <div class="small text-muted">@company.HREmail &bull; @company.ContactNumber</div>
+                                </td>
+                                <td>
+                                    <span class="badge bg-primary bg-opacity-10 text-primary">
+                                        @company.PlacementDrives.Count Drives
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="badge bg-success bg-opacity-10 text-success">
+                                        @company.Placements.Count Placed
+                                    </span>
+                                </td>
+                                <td class="text-end">
+                                    <div class="btn-group btn-group-sm">
+                                        <a asp-action="Details" asp-route-id="@company.Id" class="btn btn-outline-secondary" title="View Details">
+                                            <i class="bi bi-eye"></i> Details
+                                        </a>
+                                        @if (isAdmin)
+                                        {
+                                            <a asp-action="Edit" asp-route-id="@company.Id" class="btn btn-outline-primary" title="Edit Company">
+                                                <i class="bi bi-pencil"></i>
+                                            </a>
+                                            <a asp-action="Delete" asp-route-id="@company.Id" class="btn btn-outline-danger" title="Delete Company">
+                                                <i class="bi bi-trash"></i>
+                                            </a>
+                                        }
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="7" class="text-center py-5 text-muted">
+                                <i class="bi bi-building fs-2"></i>
+                                <p class="mt-2 mb-0">No companies found matching the search criteria.</p>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

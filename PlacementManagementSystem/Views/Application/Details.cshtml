@@ -1,0 +1,180 @@
+@model PlacementManagementSystem.Models.Application
+@{
+    ViewData["Title"] = $"Review Application - {Model.Student?.FullName}";
+    var isPlaced = (bool)(ViewBag.IsPlaced ?? false);
+}
+
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <span class="badge bg-primary bg-opacity-10 text-primary fw-bold px-3 py-1 rounded-pill mb-1">
+                Application Review
+            </span>
+            <h2 class="fw-bold text-dark mb-0">Candidate Application</h2>
+            <div class="text-muted small">ID: #@Model.Id &bull; Applied: @Model.ApplicationDate.ToString("dd MMMM yyyy, hh:mm tt")</div>
+        </div>
+        <div class="d-flex gap-2">
+            @if (Model.Status == "Selected")
+            {
+                <a asp-controller="Placement" asp-action="Create" asp-route-applicationId="@Model.Id" class="btn btn-success btn-sm fw-bold">
+                    <i class="bi bi-award me-1"></i> Create Placement Record
+                </a>
+            }
+            <a asp-action="Index" class="btn btn-outline-custom btn-sm">
+                <i class="bi bi-arrow-left me-1"></i> Back to Applications
+            </a>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <!-- STUDENT PROFILE SUMMARY -->
+        <div class="col-lg-6">
+            <div class="card card-custom p-4 mb-4">
+                <h5 class="fw-bold text-dark mb-3 pb-2 border-bottom">
+                    <i class="bi bi-person-badge text-primary me-2"></i>Applicant Details
+                </h5>
+
+                <div class="d-flex flex-column gap-3 small">
+                    <div class="d-flex justify-content-between pb-2 border-bottom">
+                        <span class="text-muted">Candidate Name:</span>
+                        <strong class="text-dark">@Model.Student?.FullName</strong>
+                    </div>
+                    <div class="d-flex justify-content-between pb-2 border-bottom">
+                        <span class="text-muted">Enrollment Number:</span>
+                        <strong class="text-dark">@Model.Student?.EnrollmentNo</strong>
+                    </div>
+                    <div class="d-flex justify-content-between pb-2 border-bottom">
+                        <span class="text-muted">Academic Department:</span>
+                        <strong class="text-dark">@Model.Student?.Department</strong>
+                    </div>
+                    <div class="d-flex justify-content-between pb-2 border-bottom">
+                        <span class="text-muted">Semester:</span>
+                        <strong class="text-dark">Semester @Model.Student?.Semester</strong>
+                    </div>
+                    <div class="d-flex justify-content-between pb-2 border-bottom">
+                        <span class="text-muted">Cumulative CGPA:</span>
+                        <span class="badge bg-success fs-6">@Model.Student?.CGPA.ToString("F2") / 10</span>
+                    </div>
+                    <div class="d-flex justify-content-between pb-2 border-bottom">
+                        <span class="text-muted">Email:</span>
+                        <a href="mailto:@Model.Student?.Email" class="text-primary text-decoration-none">@Model.Student?.Email</a>
+                    </div>
+                    <div class="d-flex justify-content-between pb-2 border-bottom">
+                        <span class="text-muted">Phone Number:</span>
+                        <strong class="text-dark">@Model.Student?.Phone</strong>
+                    </div>
+                    <div class="d-flex justify-content-between pb-2 border-bottom">
+                        <span class="text-muted">Technical Skills:</span>
+                        <span class="text-dark text-end" style="max-width: 60%;">@Model.Student?.Skills</span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="text-muted">Student Resume:</span>
+                        @if (!string.IsNullOrEmpty(Model.Student?.ResumeFileName))
+                        {
+                            <a href="~/uploads/resumes/@Model.Student?.ResumeFileName" target="_blank" class="btn btn-sm btn-outline-success">
+                                <i class="bi bi-file-earmark-pdf me-1"></i> Download Resume
+                            </a>
+                        }
+                        else
+                        {
+                            <span class="text-muted fst-italic">No resume attached</span>
+                        }
+                    </div>
+                </div>
+            </div>
+
+            <!-- DRIVE SPECIFICATIONS -->
+            <div class="card card-custom p-4">
+                <h5 class="fw-bold text-dark mb-3 pb-2 border-bottom">
+                    <i class="bi bi-briefcase text-primary me-2"></i>Job Drive Summary
+                </h5>
+                <div class="d-flex flex-column gap-3 small">
+                    <div class="d-flex justify-content-between pb-2 border-bottom">
+                        <span class="text-muted">Company:</span>
+                        <strong class="text-dark">@Model.PlacementDrive?.Company?.CompanyName</strong>
+                    </div>
+                    <div class="d-flex justify-content-between pb-2 border-bottom">
+                        <span class="text-muted">Job Role:</span>
+                        <strong class="text-dark">@Model.PlacementDrive?.JobTitle</strong>
+                    </div>
+                    <div class="d-flex justify-content-between pb-2 border-bottom">
+                        <span class="text-muted">Salary Package:</span>
+                        <strong class="text-success fs-6">₹ @(Model.PlacementDrive?.SalaryPackage.ToString("F2") ?? "0.00") LPA</strong>
+                    </div>
+                    <div class="d-flex justify-content-between pb-2 border-bottom">
+                        <span class="text-muted">Eligibility CGPA:</span>
+                        <strong>@Model.PlacementDrive?.EligibilityCGPA.ToString("F2")</strong>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <span class="text-muted">Drive Date:</span>
+                        <strong>@Model.PlacementDrive?.DriveDate.ToString("dd MMM yyyy")</strong>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- STATUS UPDATE FORM -->
+        <div class="col-lg-6">
+            <div class="card form-card shadow-sm h-100">
+                <h5 class="fw-bold text-dark mb-3 pb-2 border-bottom">
+                    <i class="bi bi-sliders text-primary me-2"></i>Update Recruitment Status
+                </h5>
+
+                <div class="p-3 bg-light rounded-3 mb-4">
+                    <div class="d-flex justify-content-between align-items-center mb-1">
+                        <span class="text-muted small">Current Application Status:</span>
+                        @{
+                            var badgeClass = Model.Status switch
+                            {
+                                "Selected" => "status-badge-selected",
+                                "Interview" => "status-badge-interview",
+                                "Shortlisted" => "status-badge-shortlisted",
+                                "Rejected" => "status-badge-rejected",
+                                _ => "status-badge-applied"
+                            };
+                        }
+                        <span class="status-badge @badgeClass fs-6">@Model.Status</span>
+                    </div>
+                    <div class="small text-muted">
+                        Remarks: <em>@(string.IsNullOrEmpty(Model.Remarks) ? "None" : Model.Remarks)</em>
+                    </div>
+                </div>
+
+                <form asp-action="UpdateStatus" method="post">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="applicationId" value="@Model.Id" />
+
+                    <div class="mb-3">
+                        <label class="form-label">New Application Status</label>
+                        <select name="status" class="form-select form-select-lg">
+                            <option value="Applied" selected="@(Model.Status == "Applied")">Applied (Initial Submission)</option>
+                            <option value="Shortlisted" selected="@(Model.Status == "Shortlisted")">Shortlisted (Resume / Online Test Cleared)</option>
+                            <option value="Interview" selected="@(Model.Status == "Interview")">Interview (Technical / HR Rounds)</option>
+                            <option value="Selected" selected="@(Model.Status == "Selected")">Selected (Offer Received)</option>
+                            <option value="Rejected" selected="@(Model.Status == "Rejected")">Rejected</option>
+                        </select>
+                        <small class="text-muted d-block mt-1">Changing status to 'Selected' will immediately prompt to create an official Placement record.</small>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label">Evaluator Remarks / Interview Feedback</label>
+                        <textarea name="remarks" class="form-control" rows="4" placeholder="Enter remarks, test score, interview feedback, or reason for status update...">@Model.Remarks</textarea>
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary-custom py-2 fw-bold">
+                            <i class="bi bi-check-circle me-1"></i> Save Status & Remarks
+                        </button>
+                    </div>
+                </form>
+
+                @if (isPlaced)
+                {
+                    <div class="alert alert-success mt-4 mb-0 small">
+                        <i class="bi bi-check-all me-1"></i> Official placement record has already been created for this student.
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>

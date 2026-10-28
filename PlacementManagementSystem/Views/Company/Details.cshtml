@@ -1,0 +1,176 @@
+@model PlacementManagementSystem.Models.Company
+@using Microsoft.AspNetCore.Http
+@inject IHttpContextAccessor HttpContextAccessor
+@{
+    ViewData["Title"] = $"Company Details - {Model.CompanyName}";
+    var isAdmin = HttpContextAccessor.HttpContext?.Session.IsAdmin() ?? false;
+}
+
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <span class="badge bg-primary bg-opacity-10 text-primary fw-bold px-3 py-1 rounded-pill mb-1">
+                Company Profile
+            </span>
+            <h2 class="fw-bold text-dark mb-0">@Model.CompanyName</h2>
+            <div class="text-muted small">@Model.Industry &bull; @Model.Location</div>
+        </div>
+        <div class="d-flex gap-2">
+            @if (isAdmin)
+            {
+                <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary-custom btn-sm">
+                    <i class="bi bi-pencil me-1"></i> Edit Company
+                </a>
+            }
+            <a asp-action="Index" class="btn btn-outline-custom btn-sm">
+                <i class="bi bi-arrow-left me-1"></i> Back to List
+            </a>
+        </div>
+    </div>
+
+    <div class="row g-4 mb-4">
+        <!-- COMPANY OVERVIEW -->
+        <div class="col-lg-5">
+            <div class="card card-custom p-4 h-100">
+                <h5 class="fw-bold text-dark mb-3 pb-2 border-bottom">
+                    <i class="bi bi-info-circle text-primary me-2"></i>Company Overview
+                </h5>
+
+                <p class="text-muted small mb-4">@Model.CompanyDescription</p>
+
+                <div class="d-flex flex-column gap-3 small">
+                    <div class="d-flex justify-content-between pb-2 border-bottom">
+                        <span class="text-muted">Industry Domain:</span>
+                        <strong class="text-dark">@Model.Industry</strong>
+                    </div>
+                    <div class="d-flex justify-content-between pb-2 border-bottom">
+                        <span class="text-muted">Headquarters / Location:</span>
+                        <strong class="text-dark">@Model.Location</strong>
+                    </div>
+                    @if (!string.IsNullOrEmpty(Model.Website))
+                    {
+                        <div class="d-flex justify-content-between pb-2 border-bottom">
+                            <span class="text-muted">Corporate Website:</span>
+                            <a href="@Model.Website" target="_blank" class="text-primary text-decoration-none fw-semibold">
+                                @Model.Website <i class="bi bi-box-arrow-up-right small"></i>
+                            </a>
+                        </div>
+                    }
+                    <div class="d-flex justify-content-between pb-2 border-bottom">
+                        <span class="text-muted">HR Lead Name:</span>
+                        <strong class="text-dark">@Model.HRName</strong>
+                    </div>
+                    <div class="d-flex justify-content-between pb-2 border-bottom">
+                        <span class="text-muted">HR Email:</span>
+                        <a href="mailto:@Model.HREmail" class="text-primary text-decoration-none">@Model.HREmail</a>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <span class="text-muted">Contact Phone:</span>
+                        <strong class="text-dark">@Model.ContactNumber</strong>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PLACEMENT DRIVES HOSTED -->
+        <div class="col-lg-7">
+            <div class="card card-custom p-4 mb-4">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="fw-bold text-dark mb-0">
+                        <i class="bi bi-briefcase text-primary me-2"></i>Campus Placement Drives (@Model.PlacementDrives.Count)
+                    </h5>
+                    @if (isAdmin)
+                    {
+                        <a asp-controller="PlacementDrive" asp-action="Create" class="btn btn-outline-primary btn-sm">
+                            <i class="bi bi-plus-lg me-1"></i> Add Drive
+                        </a>
+                    }
+                </div>
+
+                @if (Model.PlacementDrives.Any())
+                {
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0 small">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Job Title</th>
+                                    <th>Package</th>
+                                    <th>Min CGPA</th>
+                                    <th>Drive Date</th>
+                                    <th>Status</th>
+                                    <th class="text-end">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var drive in Model.PlacementDrives.OrderByDescending(d => d.DriveDate))
+                                {
+                                    <tr>
+                                        <td><strong>@drive.JobTitle</strong></td>
+                                        <td><span class="text-success fw-bold">₹ @drive.SalaryPackage.ToString("F2") LPA</span></td>
+                                        <td>@drive.EligibilityCGPA.ToString("F2")</td>
+                                        <td>@drive.DriveDate.ToString("dd MMM yyyy")</td>
+                                        <td>
+                                            <span class="status-badge @(drive.Status == "Active" ? "status-badge-active" : "status-badge-closed") py-0 px-2" style="font-size: 0.75rem;">
+                                                @drive.Status
+                                            </span>
+                                        </td>
+                                        <td class="text-end">
+                                            <a asp-controller="PlacementDrive" asp-action="Details" asp-route-id="@drive.Id" class="btn btn-sm btn-light border py-0 px-2">
+                                                View
+                                            </a>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+                else
+                {
+                    <p class="text-muted text-center py-4 mb-0">No placement drives registered for this company yet.</p>
+                }
+            </div>
+
+            <!-- STUDENTS PLACED -->
+            <div class="card card-custom p-4">
+                <h5 class="fw-bold text-dark mb-3 pb-2 border-bottom">
+                    <i class="bi bi-trophy text-warning me-2"></i>Placed Candidates (@Model.Placements.Count)
+                </h5>
+
+                @if (Model.Placements.Any())
+                {
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0 small">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Student</th>
+                                    <th>Role</th>
+                                    <th>Package</th>
+                                    <th>Placement Date</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var p in Model.Placements)
+                                {
+                                    <tr>
+                                        <td>
+                                            <strong>@p.Student?.FullName</strong>
+                                            <div class="text-muted" style="font-size: 0.75rem;">@p.Student?.EnrollmentNo &bull; @p.Student?.Department</div>
+                                        </td>
+                                        <td>@p.JobRole</td>
+                                        <td><span class="text-success fw-bold">₹ @p.Package.ToString("F2") LPA</span></td>
+                                        <td>@p.PlacementDate.ToString("dd MMM yyyy")</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+                else
+                {
+                    <p class="text-muted text-center py-3 mb-0">No students placed yet from this company.</p>
+                }
+            </div>
+        </div>
+    </div>
+</div>

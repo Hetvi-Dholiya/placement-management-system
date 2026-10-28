@@ -1,0 +1,197 @@
+@model PlacementManagementSystem.Models.Student
+@{
+    ViewData["Title"] = $"Student Details - {Model.FullName}";
+    var isPlaced = Model.Placements.Any(p => p.Status == "Placed");
+}
+
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div class="d-flex align-items-center gap-3">
+            @if (!string.IsNullOrEmpty(Model.ProfilePicture))
+            {
+                <img src="~/uploads/profiles/@Model.ProfilePicture" alt="@Model.FullName" class="rounded-circle shadow-sm border border-2 border-primary" style="width: 58px; height: 58px; object-fit: cover;" />
+            }
+            else
+            {
+                <div class="stat-icon bg-primary bg-opacity-10 text-primary" style="width: 58px; height: 58px;">
+                    <i class="bi bi-person-fill fs-2"></i>
+                </div>
+            }
+            <div>
+                <span class="badge bg-primary bg-opacity-10 text-primary fw-bold px-3 py-1 rounded-pill mb-1">
+                    Student Record
+                </span>
+                <h2 class="fw-bold text-dark mb-0">@Model.FullName</h2>
+                <div class="text-muted small">Enrollment: <strong>@Model.EnrollmentNo</strong></div>
+            </div>
+        </div>
+        <div class="d-flex gap-2">
+            <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary-custom btn-sm">
+                <i class="bi bi-pencil me-1"></i> Edit Record
+            </a>
+            <a asp-action="Index" class="btn btn-outline-custom btn-sm">
+                <i class="bi bi-arrow-left me-1"></i> Back to List
+            </a>
+        </div>
+    </div>
+
+    <div class="row g-4 mb-4">
+        <!-- ACADEMIC & PROFILE DETAILS -->
+        <div class="col-lg-5">
+            <div class="card card-custom p-4 h-100">
+                <h5 class="fw-bold text-dark mb-3 pb-2 border-bottom">
+                    <i class="bi bi-person-badge text-primary me-2"></i>Academic Profile
+                </h5>
+
+                <div class="d-flex flex-column gap-3 small">
+                    <div class="d-flex justify-content-between pb-2 border-bottom">
+                        <span class="text-muted">Enrollment Number:</span>
+                        <strong class="text-dark">@Model.EnrollmentNo</strong>
+                    </div>
+                    <div class="d-flex justify-content-between pb-2 border-bottom">
+                        <span class="text-muted">Department:</span>
+                        <strong class="text-dark">@Model.Department</strong>
+                    </div>
+                    <div class="d-flex justify-content-between pb-2 border-bottom">
+                        <span class="text-muted">Semester:</span>
+                        <strong class="text-dark">Semester @Model.Semester</strong>
+                    </div>
+                    <div class="d-flex justify-content-between pb-2 border-bottom">
+                        <span class="text-muted">Cumulative CGPA:</span>
+                        <span class="badge bg-success fs-6">@Model.CGPA.ToString("F2") / 10</span>
+                    </div>
+                    <div class="d-flex justify-content-between pb-2 border-bottom">
+                        <span class="text-muted">Email Address:</span>
+                        <strong class="text-dark">@Model.Email</strong>
+                    </div>
+                    <div class="d-flex justify-content-between pb-2 border-bottom">
+                        <span class="text-muted">Phone Number:</span>
+                        <strong class="text-dark">@Model.Phone</strong>
+                    </div>
+                    <div class="d-flex justify-content-between pb-2 border-bottom">
+                        <span class="text-muted">Date of Birth:</span>
+                        <strong class="text-dark">@Model.DateOfBirth.ToString("dd MMMM yyyy")</strong>
+                    </div>
+                    <div class="d-flex justify-content-between pb-2 border-bottom">
+                        <span class="text-muted">Gender:</span>
+                        <strong class="text-dark">@Model.Gender</strong>
+                    </div>
+                    <div class="d-flex justify-content-between pb-2 border-bottom">
+                        <span class="text-muted">Technical Skills:</span>
+                        <strong class="text-dark text-end" style="max-width: 60%;">@Model.Skills</strong>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="text-muted">Resume Document:</span>
+                        @if (!string.IsNullOrEmpty(Model.ResumeFileName))
+                        {
+                            <a href="~/uploads/resumes/@Model.ResumeFileName" target="_blank" class="btn btn-sm btn-outline-success">
+                                <i class="bi bi-file-earmark-pdf me-1"></i> View Resume
+                            </a>
+                        }
+                        else
+                        {
+                            <span class="text-muted fst-italic">Not uploaded</span>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PLACEMENT & APPLICATIONS SUMMARY -->
+        <div class="col-lg-7">
+            <!-- PLACEMENT STATUS -->
+            @if (isPlaced)
+            {
+                var placement = Model.Placements.First(p => p.Status == "Placed");
+                <div class="card card-custom p-4 bg-success bg-opacity-10 border-success mb-4">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <div class="d-flex align-items-center gap-2">
+                            <i class="bi bi-patch-check-fill text-success fs-3"></i>
+                            <div>
+                                <h5 class="fw-bold text-success mb-0">Official Placement Offer</h5>
+                                <div class="small text-muted">Confirmed campus recruitment record</div>
+                            </div>
+                        </div>
+                        <span class="status-badge status-badge-placed">Placed</span>
+                    </div>
+                    <div class="row g-2 mt-2 small">
+                        <div class="col-sm-6">
+                            <span class="text-muted">Recruiting Company:</span>
+                            <strong class="d-block text-dark">@placement.Company?.CompanyName</strong>
+                        </div>
+                        <div class="col-sm-6">
+                            <span class="text-muted">Job Role:</span>
+                            <strong class="d-block text-dark">@placement.JobRole</strong>
+                        </div>
+                        <div class="col-sm-6">
+                            <span class="text-muted">Salary CTC:</span>
+                            <strong class="d-block text-success fs-6">₹ @placement.Package.ToString("F2") LPA</strong>
+                        </div>
+                        <div class="col-sm-6">
+                            <span class="text-muted">Placement Date:</span>
+                            <strong class="d-block text-dark">@placement.PlacementDate.ToString("dd MMM yyyy")</strong>
+                        </div>
+                    </div>
+                </div>
+            }
+
+            <!-- APPLICATIONS TABLE -->
+            <div class="card card-custom p-4">
+                <h5 class="fw-bold text-dark mb-3 pb-2 border-bottom">
+                    <i class="bi bi-file-earmark-text text-primary me-2"></i>Applications History (@Model.Applications.Count)
+                </h5>
+
+                @if (Model.Applications.Any())
+                {
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0 small">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Company</th>
+                                    <th>Job Title</th>
+                                    <th>Date</th>
+                                    <th>Status</th>
+                                    <th class="text-end">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var app in Model.Applications.OrderByDescending(a => a.ApplicationDate))
+                                {
+                                    <tr>
+                                        <td><strong>@app.PlacementDrive?.Company?.CompanyName</strong></td>
+                                        <td>@app.PlacementDrive?.JobTitle</td>
+                                        <td>@app.ApplicationDate.ToString("dd MMM yyyy")</td>
+                                        <td>
+                                            @{
+                                                var badgeClass = app.Status switch
+                                                {
+                                                    "Selected" => "status-badge-selected",
+                                                    "Interview" => "status-badge-interview",
+                                                    "Shortlisted" => "status-badge-shortlisted",
+                                                    "Rejected" => "status-badge-rejected",
+                                                    _ => "status-badge-applied"
+                                                };
+                                            }
+                                            <span class="status-badge @badgeClass py-0 px-2" style="font-size: 0.75rem;">
+                                                @app.Status
+                                            </span>
+                                        </td>
+                                        <td class="text-end">
+                                            <a asp-controller="Application" asp-action="Details" asp-route-id="@app.Id" class="btn btn-sm btn-light border py-0 px-2">
+                                                Review
+                                            </a>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+                else
+                {
+                    <p class="text-muted text-center py-4 mb-0">No applications submitted by this student yet.</p>
+                }
+            </div>
+        </div>
+    </div>
+</div>

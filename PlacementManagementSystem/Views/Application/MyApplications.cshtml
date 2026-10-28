@@ -1,0 +1,142 @@
+@model IEnumerable<PlacementManagementSystem.Models.Application>
+@{
+    ViewData["Title"] = "My Applications";
+    var placement = ViewBag.Placement as PlacementManagementSystem.Models.Placement;
+}
+
+<div class="container py-4">
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center pb-3 mb-4 border-bottom">
+        <div>
+            <span class="badge bg-primary bg-opacity-10 text-primary fw-bold px-3 py-1 rounded-pill mb-1">
+                Student Portal
+            </span>
+            <h1 class="h2 fw-bold text-dark mb-0">My Applications</h1>
+            <p class="text-muted small mb-0 mt-1">Track the live progress of your submitted campus placement drive applications</p>
+        </div>
+        <div class="mt-3 mt-md-0 d-flex gap-2">
+            <a asp-controller="PlacementDrive" asp-action="Index" class="btn btn-primary-custom btn-sm">
+                <i class="bi bi-search me-1"></i> Explore More Drives
+            </a>
+            <a asp-controller="Student" asp-action="Dashboard" class="btn btn-outline-custom btn-sm">
+                <i class="bi bi-speedometer2 me-1"></i> Dashboard
+            </a>
+        </div>
+    </div>
+
+    <!-- PLACEMENT ALERT IF PLACED -->
+    @if (placement != null)
+    {
+        <div class="alert alert-success border-0 shadow-sm d-flex flex-column flex-sm-row justify-content-between align-items-sm-center p-4 mb-4 gap-3">
+            <div class="d-flex align-items-center gap-3">
+                <div class="stat-icon bg-success text-white rounded-circle" style="width: 50px; height: 50px;">
+                    <i class="bi bi-trophy-fill fs-3"></i>
+                </div>
+                <div>
+                    <h5 class="fw-bold text-success mb-1">Final Placement Confirmed!</h5>
+                    <div class="small text-muted">
+                        Placed at <strong>@placement.Company?.CompanyName</strong> as <strong>@placement.JobRole</strong> with package of <strong>₹ @placement.Package.ToString("F2") LPA</strong>.
+                    </div>
+                </div>
+            </div>
+            <a asp-controller="Placement" asp-action="MyPlacement" class="btn btn-success fw-bold px-3 py-2">
+                View Offer Letter &rarr;
+            </a>
+        </div>
+    }
+
+    <!-- APPLICATIONS TABLE -->
+    <div class="table-custom shadow-sm">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead>
+                    <tr>
+                        <th>Company</th>
+                        <th>Job Title</th>
+                        <th>Applied Date</th>
+                        <th>Drive Package</th>
+                        <th>Application Status</th>
+                        <th>Remarks / Feedback</th>
+                        <th class="text-end">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model != null && Model.Any())
+                    {
+                        @foreach (var app in Model)
+                        {
+                            var badgeClass = app.Status switch
+                            {
+                                "Selected" => "status-badge-selected",
+                                "Interview" => "status-badge-interview",
+                                "Shortlisted" => "status-badge-shortlisted",
+                                "Rejected" => "status-badge-rejected",
+                                _ => "status-badge-applied"
+                            };
+
+                            <tr>
+                                <td>
+                                    <div class="fw-bold text-dark fs-6">@app.PlacementDrive?.Company?.CompanyName</div>
+                                    <span class="small text-muted"><i class="bi bi-geo-alt me-1"></i>@app.PlacementDrive?.JobLocation</span>
+                                </td>
+                                <td>
+                                    <span class="fw-semibold text-dark">@app.PlacementDrive?.JobTitle</span>
+                                </td>
+                                <td>@app.ApplicationDate.ToString("dd MMM yyyy")</td>
+                                <td>
+                                    <span class="text-success fw-bold">₹ @(app.PlacementDrive?.SalaryPackage.ToString("F2") ?? "0.00") LPA</span>
+                                </td>
+                                <td>
+                                    <span class="status-badge @badgeClass">
+                                        @if (app.Status == "Selected")
+                                        {
+                                            <i class="bi bi-check-circle-fill"></i>
+                                        }
+                                        else if (app.Status == "Interview")
+                                        {
+                                            <i class="bi bi-person-video"></i>
+                                        }
+                                        else if (app.Status == "Shortlisted")
+                                        {
+                                            <i class="bi bi-star-fill"></i>
+                                        }
+                                        else if (app.Status == "Rejected")
+                                        {
+                                            <i class="bi bi-x-circle-fill"></i>
+                                        }
+                                        else
+                                        {
+                                            <i class="bi bi-send-fill"></i>
+                                        }
+                                        @app.Status
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="small text-muted fst-italic">
+                                        @(string.IsNullOrEmpty(app.Remarks) ? "No remarks provided" : app.Remarks)
+                                    </span>
+                                </td>
+                                <td class="text-end">
+                                    <a asp-controller="PlacementDrive" asp-action="Details" asp-route-id="@app.PlacementDriveId" class="btn btn-outline-secondary btn-sm">
+                                        Drive Details <i class="bi bi-arrow-right"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="7" class="text-center py-5 text-muted">
+                                <i class="bi bi-inbox fs-2"></i>
+                                <p class="mt-2 mb-0">You have not submitted any placement applications yet.</p>
+                                <a asp-controller="PlacementDrive" asp-action="Index" class="btn btn-sm btn-primary-custom mt-3">
+                                    Browse Active Drives
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

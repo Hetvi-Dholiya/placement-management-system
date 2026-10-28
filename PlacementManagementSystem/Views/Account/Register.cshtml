@@ -1,0 +1,140 @@
+@model PlacementManagementSystem.ViewModels.RegisterViewModel
+@{
+    ViewData["Title"] = "Student Registration";
+}
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card form-card shadow-lg border-0">
+                <div class="text-center mb-4">
+                    <span class="navbar-brand-badge py-2 px-3 fs-5 d-inline-block mb-2">CPMS</span>
+                    <h3 class="fw-bold text-dark">Student Registration</h3>
+                    <p class="text-muted small">Create your student profile to access college placement drives and recruitment opportunities</p>
+                </div>
+
+                <form asp-action="Register" method="post">
+                    @Html.AntiForgeryToken()
+
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger py-2 small" role="alert"></div>
+
+                    <div class="row g-3">
+                        <!-- Enrollment Number -->
+                        <div class="col-md-6">
+                            <label asp-for="EnrollmentNo" class="form-label"></label>
+                            <input asp-for="EnrollmentNo" class="form-control" placeholder="e.g. 22BCSE105" />
+                            <span asp-validation-for="EnrollmentNo" class="text-danger small"></span>
+                        </div>
+
+                        <!-- Full Name -->
+                        <div class="col-md-6">
+                            <label asp-for="FullName" class="form-label"></label>
+                            <input asp-for="FullName" class="form-control" placeholder="Enter full legal name" />
+                            <span asp-validation-for="FullName" class="text-danger small"></span>
+                        </div>
+
+                        <!-- Email -->
+                        <div class="col-md-6">
+                            <label asp-for="Email" class="form-label"></label>
+                            <input asp-for="Email" class="form-control" placeholder="name@college.com" />
+                            <span asp-validation-for="Email" class="text-danger small"></span>
+                        </div>
+
+                        <!-- Phone -->
+                        <div class="col-md-6">
+                            <label asp-for="Phone" class="form-label"></label>
+                            <input asp-for="Phone" class="form-control" placeholder="10-digit mobile number" />
+                            <span asp-validation-for="Phone" class="text-danger small"></span>
+                        </div>
+
+                        <!-- Date of Birth -->
+                        <div class="col-md-4">
+                            <label asp-for="DateOfBirth" class="form-label"></label>
+                            <input asp-for="DateOfBirth" class="form-control" type="date" />
+                            <span asp-validation-for="DateOfBirth" class="text-danger small"></span>
+                        </div>
+
+                        <!-- Gender -->
+                        <div class="col-md-4">
+                            <label asp-for="Gender" class="form-label"></label>
+                            <select asp-for="Gender" class="form-select">
+                                <option value="Male">Male</option>
+                                <option value="Female">Female</option>
+                                <option value="Other">Other</option>
+                            </select>
+                            <span asp-validation-for="Gender" class="text-danger small"></span>
+                        </div>
+
+                        <!-- Semester -->
+                        <div class="col-md-4">
+                            <label asp-for="Semester" class="form-label"></label>
+                            <select asp-for="Semester" class="form-select">
+                                @for (int i = 1; i <= 8; i++)
+                                {
+                                    <option value="@i">Semester @i</option>
+                                }
+                            </select>
+                            <span asp-validation-for="Semester" class="text-danger small"></span>
+                        </div>
+
+                        <!-- Department -->
+                        <div class="col-md-8">
+                            <label asp-for="Department" class="form-label"></label>
+                            <select asp-for="Department" class="form-select">
+                                <option value="Computer Science and Engineering">Computer Science and Engineering</option>
+                                <option value="Information Technology">Information Technology</option>
+                                <option value="Electronics and Communication">Electronics and Communication</option>
+                                <option value="Mechanical Engineering">Mechanical Engineering</option>
+                                <option value="Civil Engineering">Civil Engineering</option>
+                            </select>
+                            <span asp-validation-for="Department" class="text-danger small"></span>
+                        </div>
+
+                        <!-- CGPA -->
+                        <div class="col-md-4">
+                            <label asp-for="CGPA" class="form-label"></label>
+                            <input asp-for="CGPA" class="form-control" type="number" step="0.01" min="0" max="10" placeholder="e.g. 8.50" />
+                            <span asp-validation-for="CGPA" class="text-danger small"></span>
+                        </div>
+
+                        <!-- Skills -->
+                        <div class="col-12">
+                            <label asp-for="Skills" class="form-label"></label>
+                            <input asp-for="Skills" class="form-control" placeholder="e.g. C#, ASP.NET Core, MySQL, React, Python, Data Structures" />
+                            <span asp-validation-for="Skills" class="text-danger small"></span>
+                        </div>
+
+                        <!-- Password -->
+                        <div class="col-md-6">
+                            <label asp-for="Password" class="form-label"></label>
+                            <input asp-for="Password" class="form-control" placeholder="Minimum 6 characters" />
+                            <span asp-validation-for="Password" class="text-danger small"></span>
+                        </div>
+
+                        <!-- Confirm Password -->
+                        <div class="col-md-6">
+                            <label asp-for="ConfirmPassword" class="form-label"></label>
+                            <input asp-for="ConfirmPassword" class="form-control" placeholder="Re-enter password" />
+                            <span asp-validation-for="ConfirmPassword" class="text-danger small"></span>
+                        </div>
+                    </div>
+
+                    <div class="d-grid gap-2 mt-4">
+                        <button type="submit" class="btn btn-primary-custom py-2 fw-bold">
+                            <i class="bi bi-person-check-fill me-1"></i> Register Student Account
+                        </button>
+                    </div>
+
+                    <div class="text-center small text-muted mt-3">
+                        Already have an account? 
+                        <a asp-action="Login" class="text-primary fw-bold text-decoration-none">Sign In here</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

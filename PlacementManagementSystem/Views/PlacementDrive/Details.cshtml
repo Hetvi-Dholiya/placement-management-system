@@ -1,0 +1,205 @@
+@model PlacementManagementSystem.Models.PlacementDrive
+@using Microsoft.AspNetCore.Http
+@inject IHttpContextAccessor HttpContextAccessor
+@{
+    ViewData["Title"] = $"{Model.JobTitle} - {Model.Company?.CompanyName}";
+    var session = HttpContextAccessor.HttpContext?.Session;
+    var isLoggedIn = session?.IsLoggedIn() ?? false;
+    var isStudent = session?.IsStudent() ?? false;
+    var isAdmin = session?.IsAdmin() ?? false;
+
+    var currentStudent = ViewBag.CurrentStudent as PlacementManagementSystem.Models.Student;
+    var isEligible = (bool)(ViewBag.IsEligible ?? true);
+    var hasApplied = (bool)(ViewBag.HasApplied ?? false);
+    var appStatus = ViewBag.ApplicationStatus as string;
+    var ineligibilityReason = ViewBag.IneligibilityReason as string;
+    var deadlinePassed = (bool)(ViewBag.DeadlinePassed ?? false);
+}
+
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <span class="badge bg-primary bg-opacity-10 text-primary fw-bold px-3 py-1 rounded-pill mb-1">
+                Drive Details
+            </span>
+            <h2 class="fw-bold text-dark mb-0">@Model.JobTitle</h2>
+            <div class="text-primary fw-semibold fs-5"><i class="bi bi-building me-1"></i> @Model.Company?.CompanyName</div>
+        </div>
+        <div class="d-flex gap-2">
+            @if (isAdmin)
+            {
+                <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary-custom btn-sm">
+                    <i class="bi bi-pencil me-1"></i> Edit Drive
+                </a>
+            }
+            <a asp-action="Index" class="btn btn-outline-custom btn-sm">
+                <i class="bi bi-arrow-left me-1"></i> Back to Drives
+            </a>
+        </div>
+    </div>
+
+    <!-- ELIGIBILITY / APPLICATION STATUS CALLOUT -->
+    @if (isLoggedIn && isStudent)
+    {
+        @if (hasApplied)
+        {
+            <div class="alert alert-info border-0 shadow-sm d-flex align-items-center justify-content-between p-3 mb-4">
+                <div class="d-flex align-items-center gap-3">
+                    <i class="bi bi-check-circle-fill text-info fs-3"></i>
+                    <div>
+                        <strong class="d-block">Application Submitted!</strong>
+                        <span class="small text-muted">Your current application status is: </span>
+                        <span class="status-badge status-badge-applied py-0 px-2 fw-bold">@appStatus</span>
+                    </div>
+                </div>
+                <a asp-controller="Application" asp-action="MyApplications" class="btn btn-sm btn-info text-white">
+                    Track All Applications &rarr;
+                </a>
+            </div>
+        }
+        else if (isEligible)
+        {
+            <div class="alert alert-success border-0 shadow-sm d-flex flex-column flex-sm-row align-items-sm-center justify-content-between p-3 mb-4 gap-2">
+                <div class="d-flex align-items-center gap-3">
+                    <i class="bi bi-patch-check-fill text-success fs-3"></i>
+                    <div>
+                        <strong class="d-block text-success">You are Eligible for this Role!</strong>
+                        <span class="small text-muted">Your CGPA (@(currentStudent?.CGPA.ToString("F2") ?? "0.00")) and department match the criteria.</span>
+                    </div>
+                </div>
+                <form asp-controller="Application" asp-action="Apply" method="post" class="m-0">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="driveId" value="@Model.Id" />
+                    <button type="submit" class="btn btn-success fw-bold px-4 py-2 shadow-sm">
+                        <i class="bi bi-send-fill me-1"></i> Submit Application Now
+                    </button>
+                </form>
+            </div>
+        }
+        else
+        {
+            <div class="alert alert-warning border-0 shadow-sm d-flex align-items-center gap-3 p-3 mb-4">
+                <i class="bi bi-exclamation-triangle-fill text-warning fs-3"></i>
+                <div>
+                    <strong class="d-block text-dark">You are Not Eligible to Apply</strong>
+                    <span class="small text-muted">@ineligibilityReason</span>
+                </div>
+            </div>
+        }
+    }
+    else if (!isLoggedIn)
+    {
+        <div class="alert alert-light border shadow-sm d-flex align-items-center justify-content-between p-3 mb-4">
+            <div class="d-flex align-items-center gap-2">
+                <i class="bi bi-info-circle-fill text-primary fs-4"></i>
+                <span class="small">Sign in to your student account to verify eligibility and apply for this placement drive.</span>
+            </div>
+            <a asp-controller="Account" asp-action="Login" asp-route-returnUrl="@Context.Request.Path" class="btn btn-sm btn-primary-custom">
+                Login to Apply
+            </a>
+        </div>
+    }
+
+    <div class="row g-4">
+        <!-- DRIVE OVERVIEW -->
+        <div class="col-lg-8">
+            <div class="card card-custom p-4 mb-4">
+                <h5 class="fw-bold text-dark mb-3 pb-2 border-bottom">
+                    <i class="bi bi-file-text text-primary me-2"></i>Job Description
+                </h5>
+                <p class="text-secondary mb-4" style="line-height: 1.7; white-space: pre-line;">@Model.JobDescription</p>
+
+                <h5 class="fw-bold text-dark mb-3 pb-2 border-bottom">
+                    <i class="bi bi-gear-wide-connected text-primary me-2"></i>Required Skills & Competencies
+                </h5>
+                <div class="d-flex flex-wrap gap-2 mb-4">
+                    @foreach (var skill in Model.RequiredSkills.Split(new[] { ',', ';' }, StringSplitOptions.RemoveEmptyEntries))
+                    {
+                        <span class="badge bg-light text-dark border px-3 py-2 fs-6">
+                            <i class="bi bi-check2 text-primary me-1"></i> @skill.Trim()
+                        </span>
+                    }
+                </div>
+
+                <h5 class="fw-bold text-dark mb-3 pb-2 border-bottom">
+                    <i class="bi bi-building text-primary me-2"></i>About @Model.Company?.CompanyName
+                </h5>
+                <p class="text-muted small mb-2">@Model.Company?.CompanyDescription</p>
+                <div class="small">
+                    <a asp-controller="Company" asp-action="Details" asp-route-id="@Model.CompanyId" class="text-primary text-decoration-none fw-semibold">
+                        View Full Company Profile &rarr;
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- DRIVE KEY FACTS & ACTION SIDEBAR -->
+        <div class="col-lg-4">
+            <div class="card card-custom p-4 mb-4">
+                <h5 class="fw-bold text-dark mb-3 pb-2 border-bottom">
+                    <i class="bi bi-card-checklist text-primary me-2"></i>Drive Key Facts
+                </h5>
+
+                <div class="d-flex flex-column gap-3 small">
+                    <div class="d-flex justify-content-between pb-2 border-bottom">
+                        <span class="text-muted">Salary Package (CTC):</span>
+                        <strong class="text-success fs-5">₹ @Model.SalaryPackage.ToString("F2") LPA</strong>
+                    </div>
+                    <div class="d-flex justify-content-between pb-2 border-bottom">
+                        <span class="text-muted">Minimum CGPA:</span>
+                        <strong class="text-dark">@Model.EligibilityCGPA.ToString("F2") / 10</strong>
+                    </div>
+                    <div class="d-flex justify-content-between pb-2 border-bottom">
+                        <span class="text-muted">Eligible Branch:</span>
+                        <strong class="text-dark">@Model.EligibleDepartment</strong>
+                    </div>
+                    <div class="d-flex justify-content-between pb-2 border-bottom">
+                        <span class="text-muted">Job Location:</span>
+                        <strong class="text-dark">@Model.JobLocation</strong>
+                    </div>
+                    <div class="d-flex justify-content-between pb-2 border-bottom">
+                        <span class="text-muted">Total Vacancies:</span>
+                        <strong class="text-dark">@Model.NumberOfVacancies Positions</strong>
+                    </div>
+                    <div class="d-flex justify-content-between pb-2 border-bottom">
+                        <span class="text-muted">Drive Schedule Date:</span>
+                        <strong class="text-dark">@Model.DriveDate.ToString("dd MMMM yyyy")</strong>
+                    </div>
+                    <div class="d-flex justify-content-between pb-2 border-bottom">
+                        <span class="text-muted">Application Deadline:</span>
+                        <strong class="@(deadlinePassed ? "text-danger" : "text-dark")">@Model.ApplicationDeadline.ToString("dd MMMM yyyy")</strong>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <span class="text-muted">Status:</span>
+                        <span class="status-badge status-badge-active">@Model.Status</span>
+                    </div>
+                </div>
+
+                @if (isLoggedIn && isStudent && isEligible && !hasApplied)
+                {
+                    <div class="d-grid gap-2 mt-4">
+                        <form asp-controller="Application" asp-action="Apply" method="post">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="driveId" value="@Model.Id" />
+                            <button type="submit" class="btn btn-primary-custom w-100 py-2 fw-bold">
+                                <i class="bi bi-send me-1"></i> Apply for this Drive
+                            </button>
+                        </form>
+                    </div>
+                }
+            </div>
+
+            <!-- APPLICANTS SUMMARY FOR ADMIN -->
+            @if (isAdmin)
+            {
+                <div class="card card-custom p-4">
+                    <h6 class="fw-bold text-dark mb-3"><i class="bi bi-people me-1 text-primary"></i>Applications Received (@Model.Applications.Count)</h6>
+                    <p class="small text-muted mb-3">Review candidates who applied for this drive and update shortlisting rounds.</p>
+                    <a asp-controller="Application" asp-action="Index" asp-route-driveId="@Model.Id" class="btn btn-outline-primary btn-sm w-100">
+                        View Applicants &rarr;
+                    </a>
+                </div>
+            }
+        </div>
+    </div>
+</div>

@@ -1,0 +1,257 @@
+@model PlacementManagementSystem.ViewModels.StudentDashboardViewModel
+@{
+    ViewData["Title"] = "Student Dashboard";
+}
+
+<div class="container py-4">
+    <!-- WELCOME HEADER -->
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center pb-3 mb-4 border-bottom">
+        <div class="d-flex align-items-center gap-3">
+            @if (!string.IsNullOrEmpty(Model.Student.ProfilePicture))
+            {
+                <img src="~/uploads/profiles/@Model.Student.ProfilePicture" alt="@Model.Student.FullName" class="rounded-circle shadow-sm border border-2 border-primary" style="width: 58px; height: 58px; object-fit: cover;" />
+            }
+            <div>
+                <span class="badge bg-primary bg-opacity-10 text-primary fw-bold px-3 py-1 rounded-pill mb-1">
+                    <i class="bi bi-person-badge me-1"></i> Student Portal
+                </span>
+                <h1 class="h2 fw-bold text-dark mb-0">Welcome, @Model.Student.FullName</h1>
+                <p class="text-muted small mb-0 mt-1">
+                    @Model.Student.Department | Semester @Model.Student.Semester | Enrollment: <strong>@Model.Student.EnrollmentNo</strong> | CGPA: <span class="badge bg-success">@Model.Student.CGPA.ToString("F2") / 10</span>
+                </p>
+            </div>
+        </div>
+        <div class="mt-3 mt-md-0 d-flex gap-2">
+            <a asp-controller="PlacementDrive" asp-action="Index" class="btn btn-primary-custom btn-sm">
+                <i class="bi bi-briefcase me-1"></i> Browse All Drives
+            </a>
+            <a asp-action="Profile" class="btn btn-outline-custom btn-sm">
+                <i class="bi bi-person-gear me-1"></i> Edit Profile
+            </a>
+        </div>
+    </div>
+
+    <!-- PLACEMENT CONGRATULATIONS BANNER (IF PLACED) -->
+    @if (Model.IsPlaced && Model.FinalPlacement != null)
+    {
+        <div class="card border-0 shadow-sm mb-4" style="background: linear-gradient(135deg, #059669 0%, #10b981 100%); color: white;">
+            <div class="card-body p-4 d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="stat-icon bg-white text-success rounded-circle" style="width: 60px; height: 60px;">
+                        <i class="bi bi-trophy-fill fs-2"></i>
+                    </div>
+                    <div>
+                        <h4 class="fw-bold mb-1">Congratulations! You are officially Placed!</h4>
+                        <p class="mb-0 text-white-50 small">
+                            Offered role <strong>@Model.FinalPlacement.JobRole</strong> at <strong>@Model.FinalPlacement.Company?.CompanyName</strong> with package of <strong>₹ @Model.FinalPlacement.Package.ToString("F2") LPA</strong>.
+                        </p>
+                    </div>
+                </div>
+                <div>
+                    <a asp-controller="Placement" asp-action="MyPlacement" class="btn btn-light text-success fw-bold px-3 py-2 shadow-sm">
+                        <i class="bi bi-file-earmark-check me-1"></i> View Placement Letter
+                    </a>
+                </div>
+            </div>
+        </div>
+    }
+
+    <!-- STATS CARDS -->
+    <div class="row g-4 mb-5">
+        <div class="col-md-3 col-6">
+            <div class="stat-card">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <div class="stat-label">Available Drives</div>
+                        <div class="stat-number text-primary">@Model.AvailableDrivesCount</div>
+                    </div>
+                    <div class="stat-icon bg-primary bg-opacity-10 text-primary">
+                        <i class="bi bi-briefcase"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-6">
+            <div class="stat-card">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <div class="stat-label">Applied Drives</div>
+                        <div class="stat-number text-info">@Model.AppliedDrivesCount</div>
+                    </div>
+                    <div class="stat-icon bg-info bg-opacity-10 text-info">
+                        <i class="bi bi-send-check"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-6">
+            <div class="stat-card">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <div class="stat-label">Shortlisted</div>
+                        <div class="stat-number text-purple" style="color: #7e22ce;">@Model.ShortlistedCount</div>
+                    </div>
+                    <div class="stat-icon bg-purple bg-opacity-10" style="background-color: #faf5ff; color: #7e22ce;">
+                        <i class="bi bi-star"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-6">
+            <div class="stat-card">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <div class="stat-label">Selected</div>
+                        <div class="stat-number text-success">@Model.SelectedCount</div>
+                    </div>
+                    <div class="stat-icon bg-success bg-opacity-10 text-success">
+                        <i class="bi bi-check-circle"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <!-- RECENT ELIGIBLE DRIVES -->
+        <div class="col-lg-7">
+            <div class="card card-custom h-100 p-4">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h5 class="fw-bold text-dark mb-0">
+                        <i class="bi bi-sparkles text-warning me-2"></i>Eligible Placement Drives
+                    </h5>
+                    <a asp-controller="PlacementDrive" asp-action="Index" class="btn btn-outline-custom btn-sm">
+                        View All
+                    </a>
+                </div>
+
+                @if (Model.RecentEligibleDrives.Any())
+                {
+                    <div class="d-flex flex-column gap-3">
+                        @foreach (var item in Model.RecentEligibleDrives)
+                        {
+                            <div class="p-3 rounded-3 border bg-light d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-3">
+                                <div>
+                                    <div class="d-flex align-items-center gap-2 mb-1">
+                                        <h6 class="fw-bold mb-0 text-dark">@item.Drive.JobTitle</h6>
+                                        @if (item.HasApplied)
+                                        {
+                                            <span class="status-badge status-badge-applied py-0 px-2" style="font-size: 0.75rem;">
+                                                Applied (@item.ApplicationStatus)
+                                            </span>
+                                        }
+                                        else if (item.IsEligible)
+                                        {
+                                            <span class="status-badge status-badge-selected py-0 px-2" style="font-size: 0.75rem;">
+                                                Eligible
+                                            </span>
+                                        }
+                                    </div>
+                                    <div class="small text-muted mb-2">
+                                        <i class="bi bi-building me-1"></i> @item.Drive.Company?.CompanyName &bull; 
+                                        <i class="bi bi-geo-alt me-1"></i> @item.Drive.JobLocation
+                                    </div>
+                                    <div class="small">
+                                        <span class="text-success fw-bold me-3">₹ @item.Drive.SalaryPackage.ToString("F2") LPA</span>
+                                        <span class="text-muted">Deadline: @item.Drive.ApplicationDeadline.ToString("dd MMM yyyy")</span>
+                                    </div>
+                                </div>
+                                <div class="text-sm-end">
+                                    @if (item.HasApplied)
+                                    {
+                                        <a asp-controller="Application" asp-action="MyApplications" class="btn btn-sm btn-outline-primary">
+                                            Track Status
+                                        </a>
+                                    }
+                                    else if (item.IsEligible)
+                                    {
+                                        <form asp-controller="Application" asp-action="Apply" method="post" class="d-inline">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="driveId" value="@item.Drive.Id" />
+                                            <button type="submit" class="btn btn-sm btn-primary-custom">
+                                                Apply Now
+                                            </button>
+                                        </form>
+                                    }
+                                    else
+                                    {
+                                        <a asp-controller="PlacementDrive" asp-action="Details" asp-route-id="@item.Drive.Id" class="btn btn-sm btn-outline-secondary">
+                                            Details
+                                        </a>
+                                    }
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
+                else
+                {
+                    <div class="text-center py-4 text-muted">
+                        <i class="bi bi-check2-all fs-1"></i>
+                        <p class="mt-2 mb-0">No new drives to apply for at this moment.</p>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <!-- MY RECENT APPLICATIONS -->
+        <div class="col-lg-5">
+            <div class="card card-custom h-100 p-4">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h5 class="fw-bold text-dark mb-0">
+                        <i class="bi bi-file-earmark-check text-primary me-2"></i>My Applications
+                    </h5>
+                    <a asp-controller="Application" asp-action="MyApplications" class="btn btn-outline-custom btn-sm">
+                        View All
+                    </a>
+                </div>
+
+                @if (Model.MyRecentApplications.Any())
+                {
+                    <div class="d-flex flex-column gap-3">
+                        @foreach (var app in Model.MyRecentApplications)
+                        {
+                            <div class="p-3 rounded-3 border bg-white shadow-sm">
+                                <div class="d-flex justify-content-between align-items-start mb-1">
+                                    <h6 class="fw-bold mb-0 text-dark">@app.PlacementDrive?.JobTitle</h6>
+                                    @{
+                                        var badgeClass = app.Status switch
+                                        {
+                                            "Selected" => "status-badge-selected",
+                                            "Interview" => "status-badge-interview",
+                                            "Shortlisted" => "status-badge-shortlisted",
+                                            "Rejected" => "status-badge-rejected",
+                                            _ => "status-badge-applied"
+                                        };
+                                    }
+                                    <span class="status-badge @badgeClass py-1 px-2" style="font-size: 0.75rem;">
+                                        @app.Status
+                                    </span>
+                                </div>
+                                <div class="small text-muted mb-2">
+                                    <i class="bi bi-building me-1"></i> @app.PlacementDrive?.Company?.CompanyName
+                                </div>
+                                <div class="d-flex justify-content-between align-items-center small text-muted pt-2 border-top">
+                                    <span>Applied: @app.ApplicationDate.ToString("dd MMM yyyy")</span>
+                                    <a asp-controller="PlacementDrive" asp-action="Details" asp-route-id="@app.PlacementDriveId" class="text-primary text-decoration-none fw-semibold">
+                                        View Drive &rarr;
+                                    </a>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
+                else
+                {
+                    <div class="text-center py-4 text-muted">
+                        <i class="bi bi-folder2-open fs-1"></i>
+                        <p class="mt-2 mb-0">You have not submitted any applications yet.</p>
+                        <a asp-controller="PlacementDrive" asp-action="Index" class="btn btn-sm btn-primary-custom mt-3">
+                            Browse Placement Drives
+                        </a>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>

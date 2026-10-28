@@ -1,0 +1,120 @@
+@{
+    ViewData["Title"] = "Contact Placement Cell";
+}
+
+<div class="container py-5">
+    <div class="text-center mb-5">
+        <span class="badge bg-primary bg-opacity-10 text-primary fw-bold px-3 py-1 rounded-pill mb-2">
+            <i class="bi bi-geo-alt-fill me-1"></i> Get In Touch
+        </span>
+        <h1 class="display-6 fw-bold text-dark mb-2">Training & Placement Cell</h1>
+        <p class="text-muted lead fs-6">Reach out to the college placement office for corporate drives, student inquiries, or campus recruitment partnerships.</p>
+    </div>
+
+    <div class="row g-4 justify-content-center">
+        <!-- CONTACT INFORMATION CARDS -->
+        <div class="col-lg-5">
+            <div class="card card-custom p-4 h-100 shadow-sm">
+                <h4 class="fw-bold text-dark mb-3 pb-2 border-bottom">
+                    <i class="bi bi-building text-primary me-2"></i>Office Location
+                </h4>
+
+                <div class="d-flex flex-column gap-3 mb-4">
+                    <div class="d-flex align-items-start gap-3">
+                        <div class="stat-icon bg-primary bg-opacity-10 text-primary rounded-circle" style="width: 44px; height: 44px; min-width: 44px;">
+                            <i class="bi bi-geo-alt-fill fs-5"></i>
+                        </div>
+                        <div>
+                            <strong class="text-dark d-block">Campus Address</strong>
+                            <span class="text-muted small">Training & Placement Cell, Academic Block A, Level 3<br />College of Engineering & Technology, Campus Road</span>
+                        </div>
+                    </div>
+
+                    <div class="d-flex align-items-start gap-3">
+                        <div class="stat-icon bg-success bg-opacity-10 text-success rounded-circle" style="width: 44px; height: 44px; min-width: 44px;">
+                            <i class="bi bi-envelope-fill fs-5"></i>
+                        </div>
+                        <div>
+                            <strong class="text-dark d-block">Email Support</strong>
+                            <a href="mailto:admin@college.com" class="text-primary text-decoration-none small">admin@college.com</a><br />
+                            <a href="mailto:placements@college.com" class="text-muted text-decoration-none small">placements@college.com</a>
+                        </div>
+                    </div>
+
+                    <div class="d-flex align-items-start gap-3">
+                        <div class="stat-icon bg-info bg-opacity-10 text-info rounded-circle" style="width: 44px; height: 44px; min-width: 44px;">
+                            <i class="bi bi-telephone-fill fs-5"></i>
+                        </div>
+                        <div>
+                            <strong class="text-dark d-block">Phone Inquiries</strong>
+                            <span class="text-muted small">+91 98765 43210 (TPO Helpline)<br />+91 98765 43211 (Corporate Relations)</span>
+                        </div>
+                    </div>
+
+                    <div class="d-flex align-items-start gap-3">
+                        <div class="stat-icon bg-warning bg-opacity-10 text-warning rounded-circle" style="width: 44px; height: 44px; min-width: 44px;">
+                            <i class="bi bi-clock-fill fs-5"></i>
+                        </div>
+                        <div>
+                            <strong class="text-dark d-block">Working Hours</strong>
+                            <span class="text-muted small">Monday &ndash; Friday: 9:00 AM &ndash; 5:30 PM<br />Saturday: 9:00 AM &ndash; 1:00 PM</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="p-3 rounded-3 bg-light border small text-muted">
+                    <i class="bi bi-info-circle-fill text-primary me-1"></i> For on-campus drive scheduling and MoU discussions, corporate recruiters may contact the Placement Director directly at <strong class="text-dark">admin@college.com</strong>.
+                </div>
+            </div>
+        </div>
+
+        <!-- CONTACT MESSAGE FORM -->
+        <div class="col-lg-7">
+            <div class="card form-card shadow-sm p-4 h-100">
+                <h4 class="fw-bold text-dark mb-3 pb-2 border-bottom">
+                    <i class="bi bi-chat-left-dots text-primary me-2"></i>Send an Inquiry
+                </h4>
+
+                <form onsubmit="event.preventDefault(); alert('Thank you for contacting the Placement Cell! We will get back to you shortly.'); this.reset();">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label small fw-semibold">Your Name</label>
+                            <input type="text" class="form-control" placeholder="Full Name" required />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-semibold">Email Address</label>
+                            <input type="email" class="form-control" placeholder="name@domain.com" required />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-semibold">Phone Number</label>
+                            <input type="tel" class="form-control" placeholder="10-digit phone" />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-semibold">I am a</label>
+                            <select class="form-select">
+                                <option value="Student">Current Student</option>
+                                <option value="Recruiter">Corporate Recruiter</option>
+                                <option value="Alumnus">Alumnus</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label small fw-semibold">Subject</label>
+                            <input type="text" class="form-control" placeholder="e.g. Campus Recruitment Drive Query" required />
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label small fw-semibold">Message</label>
+                            <textarea class="form-control" rows="4" placeholder="How can the Placement Cell assist you?" required></textarea>
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-end mt-4 pt-3 border-top">
+                        <button type="submit" class="btn btn-primary-custom px-4 fw-bold">
+                            <i class="bi bi-send-fill me-1"></i> Send Inquiry
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

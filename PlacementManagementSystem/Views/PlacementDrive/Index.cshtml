@@ -1,0 +1,213 @@
+@model IEnumerable<PlacementManagementSystem.ViewModels.PlacementDriveCardViewModel>
+@using Microsoft.AspNetCore.Http
+@inject IHttpContextAccessor HttpContextAccessor
+@{
+    ViewData["Title"] = "Placement Drives";
+    var session = HttpContextAccessor.HttpContext?.Session;
+    var isAdmin = session?.IsAdmin() ?? false;
+    var isStudent = session?.IsStudent() ?? false;
+    var companies = ViewBag.Companies as SelectList;
+    var departments = ViewBag.Departments as List<string> ?? new List<string>();
+    var searchString = ViewBag.SearchString as string;
+    var selectedCompanyId = ViewBag.SelectedCompanyId as int?;
+    var selectedDept = ViewBag.SelectedDepartment as string;
+}
+
+<div class="container py-4">
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center pb-3 mb-4 border-bottom">
+        <div>
+            <span class="badge bg-primary bg-opacity-10 text-primary fw-bold px-3 py-1 rounded-pill mb-1">
+                Campus Recruitment
+            </span>
+            <h1 class="h2 fw-bold text-dark mb-0">Placement Drives</h1>
+            <p class="text-muted small mb-0 mt-1">Explore current campus recruitment opportunities, eligibility requirements, and application deadlines</p>
+        </div>
+        @if (isAdmin)
+        {
+            <div class="mt-3 mt-md-0">
+                <a asp-action="Create" class="btn btn-primary-custom btn-sm">
+                    <i class="bi bi-plus-circle me-1"></i> Create Placement Drive
+                </a>
+            </div>
+        }
+    </div>
+
+    <!-- SEARCH & FILTER BAR -->
+    <div class="filter-card">
+        <form method="get" asp-action="Index">
+            <div class="row g-3 align-items-end">
+                <div class="col-md-3">
+                    <label class="form-label small">Search Job Title / Skills</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-white border-end-0"><i class="bi bi-search text-muted"></i></span>
+                        <input type="text" name="searchString" value="@searchString" class="form-control border-start-0" placeholder="Title, skills, or company..." />
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label small">Filter by Company</label>
+                    <select name="companyId" class="form-select" asp-items="companies">
+                        <option value="">All Companies</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label small">Filter by Department</label>
+                    <select name="department" class="form-select">
+                        <option value="All">All Departments</option>
+                        @foreach (var dept in departments)
+                        {
+                            <option value="@dept" selected="@(selectedDept == dept)">@dept</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-md-3 d-flex gap-2">
+                    <button type="submit" class="btn btn-primary-custom flex-grow-1">
+                        <i class="bi bi-funnel me-1"></i> Search
+                    </button>
+                    <a asp-action="Index" class="btn btn-outline-custom">
+                        Reset
+                    </a>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- DRIVES GRID -->
+    <div class="row g-4">
+        @if (Model != null && Model.Any())
+        {
+            @foreach (var item in Model)
+            {
+                var drive = item.Drive;
+                <div class="col-lg-4 col-md-6">
+                    <div class="card card-custom card-interactive h-100 p-4 d-flex flex-column justify-content-between shadow-sm">
+                        <div>
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <span class="badge bg-primary bg-opacity-10 text-primary fw-semibold px-2 py-1 rounded">
+                                    <i class="bi bi-geo-alt me-1"></i> @drive.JobLocation
+                                </span>
+                                @if (item.HasApplied)
+                                {
+                                    <span class="status-badge status-badge-applied">
+                                        <i class="bi bi-check2-circle"></i> Applied (@item.ApplicationStatus)
+                                    </span>
+                                }
+                                else if (item.IsDeadlinePassed)
+                                {
+                                    <span class="status-badge status-badge-closed">
+                                        <i class="bi bi-x-circle"></i> Closed
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="status-badge status-badge-active">
+                                        <i class="bi bi-lightning-charge-fill"></i> @drive.Status
+                                    </span>
+                                }
+                            </div>
+
+                            <h5 class="fw-bold text-dark mb-1">@drive.JobTitle</h5>
+                            <h6 class="text-primary fw-semibold mb-3">
+                                <i class="bi bi-building me-1"></i> @drive.Company?.CompanyName
+                            </h6>
+
+                            <div class="bg-light p-3 rounded-3 mb-3 small">
+                                <div class="row g-2">
+                                    <div class="col-6">
+                                        <span class="text-muted d-block">Package:</span>
+                                        <strong class="text-success fs-6">₹ @drive.SalaryPackage.ToString("F2") LPA</strong>
+                                    </div>
+                                    <div class="col-6">
+                                        <span class="text-muted d-block">Eligibility CGPA:</span>
+                                        <strong>@drive.EligibilityCGPA.ToString("F2") / 10</strong>
+                                    </div>
+                                    <div class="col-6">
+                                        <span class="text-muted d-block">Eligible Dept:</span>
+                                        <strong class="text-truncate d-block">@drive.EligibleDepartment</strong>
+                                    </div>
+                                    <div class="col-6">
+                                        <span class="text-muted d-block">Vacancies:</span>
+                                        <strong>@drive.NumberOfVacancies Positions</strong>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <p class="small text-muted mb-3" style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
+                                @drive.JobDescription
+                            </p>
+
+                            @if (!string.IsNullOrEmpty(item.IneligibilityReason) && isStudent && !item.HasApplied)
+                            {
+                                <div class="alert alert-warning py-1 px-2 small mb-3">
+                                    <i class="bi bi-info-circle me-1"></i> @item.IneligibilityReason
+                                </div>
+                            }
+                        </div>
+
+                        <div class="pt-3 border-top">
+                            <div class="d-flex justify-content-between align-items-center mb-2 small text-muted">
+                                <span><i class="bi bi-calendar3 me-1"></i> Drive: @drive.DriveDate.ToString("dd MMM yyyy")</span>
+                                <span class="text-danger fw-semibold"><i class="bi bi-clock me-1"></i> Apply by: @drive.ApplicationDeadline.ToString("dd MMM")</span>
+                            </div>
+
+                            <div class="d-flex justify-content-between align-items-center gap-2">
+                                <a asp-action="Details" asp-route-id="@drive.Id" class="btn btn-outline-custom btn-sm flex-grow-1">
+                                    View Details
+                                </a>
+
+                                @if (isStudent)
+                                {
+                                    @if (item.HasApplied)
+                                    {
+                                        <a asp-controller="Application" asp-action="MyApplications" class="btn btn-sm btn-outline-primary">
+                                            Status
+                                        </a>
+                                    }
+                                    else if (item.IsEligible)
+                                    {
+                                        <form asp-controller="Application" asp-action="Apply" method="post" class="d-inline">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="driveId" value="@drive.Id" />
+                                            <button type="submit" class="btn btn-sm btn-primary-custom">
+                                                Apply
+                                            </button>
+                                        </form>
+                                    }
+                                    else
+                                    {
+                                        <button class="btn btn-sm btn-secondary" disabled title="@item.IneligibilityReason">
+                                            Ineligible
+                                        </button>
+                                    }
+                                }
+                                else if (isAdmin)
+                                {
+                                    <div class="btn-group btn-group-sm">
+                                        <a asp-action="Edit" asp-route-id="@drive.Id" class="btn btn-light border" title="Edit">
+                                            <i class="bi bi-pencil"></i>
+                                        </a>
+                                        <a asp-action="Delete" asp-route-id="@drive.Id" class="btn btn-light border text-danger" title="Delete">
+                                            <i class="bi bi-trash"></i>
+                                        </a>
+                                    </div>
+                                }
+                                else
+                                {
+                                    <a asp-controller="Account" asp-action="Login" class="btn btn-sm btn-primary-custom">
+                                        Login to Apply
+                                    </a>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+        else
+        {
+            <div class="col-12 text-center py-5">
+                <i class="bi bi-briefcase fs-1 text-muted"></i>
+                <p class="text-muted mt-2">No placement drives found matching your criteria.</p>
+            </div>
+        }
+    </div>
+</div>
