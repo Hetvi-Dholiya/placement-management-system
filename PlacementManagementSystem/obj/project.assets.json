@@ -2060,11 +2060,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\Admin\\.net project\\PlacementManagementSystem\\PlacementManagementSystem.csproj",
+      "projectUniqueName": "c:\\Users\\Admin\\.net project\\PlacementManagementSystem\\PlacementManagementSystem.csproj",
       "projectName": "PlacementManagementSystem",
-      "projectPath": "C:\\Users\\Admin\\.net project\\PlacementManagementSystem\\PlacementManagementSystem.csproj",
+      "projectPath": "c:\\Users\\Admin\\.net project\\PlacementManagementSystem\\PlacementManagementSystem.csproj",
       "packagesPath": "C:\\Users\\Admin\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\Admin\\.net project\\PlacementManagementSystem\\obj\\",
+      "outputPath": "c:\\Users\\Admin\\.net project\\PlacementManagementSystem\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\Admin\\AppData\\Roaming\\NuGet\\NuGet.Config"
@@ -2554,5 +2554,17 @@
         }
       }
     }
-  }
+  },
+  "logs": [
+    {
+      "code": "NU1902",
+      "level": "Warning",
+      "warningLevel": 1,
+      "message": "Package 'MySqlConnector' 2.4.0 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-473q-m89c-ghf8",
+      "libraryId": "MySqlConnector",
+      "targetGraphs": [
+        "net10.0"
+      ]
+    }
+  ]
 }

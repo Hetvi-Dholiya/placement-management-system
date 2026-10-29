@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\Admin\\.net project\\PlacementManagementSystem\\PlacementManagementSystem.csproj": {}
+    "c:\\Users\\Admin\\.net project\\PlacementManagementSystem\\PlacementManagementSystem.csproj": {}
   },
   "projects": {
-    "C:\\Users\\Admin\\.net project\\PlacementManagementSystem\\PlacementManagementSystem.csproj": {
+    "c:\\Users\\Admin\\.net project\\PlacementManagementSystem\\PlacementManagementSystem.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\Admin\\.net project\\PlacementManagementSystem\\PlacementManagementSystem.csproj",
+        "projectUniqueName": "c:\\Users\\Admin\\.net project\\PlacementManagementSystem\\PlacementManagementSystem.csproj",
         "projectName": "PlacementManagementSystem",
-        "projectPath": "C:\\Users\\Admin\\.net project\\PlacementManagementSystem\\PlacementManagementSystem.csproj",
+        "projectPath": "c:\\Users\\Admin\\.net project\\PlacementManagementSystem\\PlacementManagementSystem.csproj",
         "packagesPath": "C:\\Users\\Admin\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\Admin\\.net project\\PlacementManagementSystem\\obj\\",
+        "outputPath": "c:\\Users\\Admin\\.net project\\PlacementManagementSystem\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\Admin\\AppData\\Roaming\\NuGet\\NuGet.Config"

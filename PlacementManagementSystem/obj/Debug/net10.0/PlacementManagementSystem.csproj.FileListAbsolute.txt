@@ -187,3 +187,4 @@ C:\Users\Admin\.net project\PlacementManagementSystem\obj\Debug\net10.0\refint\P
 C:\Users\Admin\.net project\PlacementManagementSystem\obj\Debug\net10.0\PlacementManagementSystem.pdb
 C:\Users\Admin\.net project\PlacementManagementSystem\obj\Debug\net10.0\PlacementManagementSystem.genruntimeconfig.cache
 C:\Users\Admin\.net project\PlacementManagementSystem\obj\Debug\net10.0\ref\PlacementManagementSystem.dll
+c:\Users\Admin\.net project\PlacementManagementSystem\obj\Debug\net10.0\PlacementManagementSystem.sourcelink.json
